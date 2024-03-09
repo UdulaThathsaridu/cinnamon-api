@@ -1,19 +1,28 @@
-const express = require('express')
-
+require("dotenv").config({path:"./config/config.env"})
+const express = require('express');
 const morgan = require('morgan');
-
+const connectDB = require("./config/db");
+//middleware/auth will act as defender for the route
+const auth =require("./middlewares/auth")
 //intialize express app
 const app = express();
 
 //middlewares
 app.use(express.json()); //send responses back in json format
 app.use(morgan("tiny"));//if we hit any api endpoint this will log into our console
+app.use(require("cors")());
 
 //routes
-app.get("/", (req,res) => {
-    res.send("Hello World");
-})
 
+//protected route
+
+app.get("/protected",auth,(req,res)=>{
+    return res.status(200).json({...req.user._doc});
+});
+
+app.use("/api",require("./routes/auth"));
+
+app.use("/api",require("./routes/employee_route"));
 
 //server configurations
 //define port
@@ -22,7 +31,14 @@ const PORT=process.env.PORT || 4000;
 
 //listen on port by our server
 //we dont need to connect to our app before our database so we do await
-app.listen(PORT , () => {
-    console.log(`server listening on port: ${PORT}`)
+app.listen(PORT, async () => {
+    try{
+        await connectDB();
+        console.log(`server listening on port: ${PORT}`);
+
+    } catch (error) {
+        console.log("Error connecting to database:",error.message)
+
+    }
 });
 
