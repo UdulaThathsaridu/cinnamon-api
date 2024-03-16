@@ -18,7 +18,8 @@
     "joi": "^17.12.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "react-bootstrap": "^2.10.1"
   },
   "description": ""
 }
