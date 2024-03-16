@@ -22,7 +22,7 @@ app.get("/protected",auth,(req,res)=>{
 
 app.use("/api",require("./routes/auth"));
 
-app.use("/api",require("./routes/employee_route"));
+app.use("/api/employees",require("./routes/employees"));
 
 //server configurations
 //define port
