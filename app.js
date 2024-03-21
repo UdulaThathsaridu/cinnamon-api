@@ -24,6 +24,22 @@ app.use("/api",require("./routes/auth"));
 
 app.use("/api/employees",require("./routes/employees"));
 
+app.use("/api/payslips",require("./routes/payslips"));
+
+app.use("/api/leaves",require("./routes/leaves"));
+
+app.use("/api/suppliers",require("./routes/suppliers"));
+
+app.use("/api/payments",require("./routes/payments"));
+
+app.use("/api/products",require("./routes/products"));
+
+app.use("/api/deliveries",require("./routes/deliveries"));
+
+app.use("/api/inventories",require("./routes/inventories"));
+
+app.use("/api/vehicles",require("./routes/vehicles"));
+
 //server configurations
 //define port
 

@@ -135,7 +135,12 @@ router.post("/login",async(req,res) => {
 });
 
 router.get("/me",auth,async(req,res)=>{
-  return res.status(200).json({...req.user._doc});
+  try {
+    return res.status(200).json({...req.user._doc,name:req.user.name});
+  } catch (err) {
+    return res.status(500).json({error:err.message});
+    
+  }
 
 })
 
