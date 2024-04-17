@@ -4,6 +4,17 @@ const bcrypt = require('bcrypt');
 const auth = require('../middlewares/auth');
 const { USER_TYPES } = require("../constants");
 const { validateLeave,Leave } = require('../models/Leave');
+const nodemailer = require('nodemailer');
+
+//define a transporter using SMTP settings
+
+const transporter = nodemailer.createTransport({
+    service:'outlook',
+    auth:{
+        user:'udulacode@outlook.com',
+        pass:'r#zor2003@#'
+    }
+});
 
 //create leaves
 
@@ -17,7 +28,9 @@ router.post("/", async(req,res) => {
             return res.status(400).json({ error:error.details[0].message })
           }
           try {
-            const newLeave = new Leave(req.body);
+            const newLeave = new Leave({...req.body,
+            createdAt: new Date()
+        });
             const result = await newLeave.save();
             return res.status(201).json(result);
             
@@ -32,7 +45,7 @@ router.post("/", async(req,res) => {
 
 router.get("/", async(req,res) => {
     try {
-        const leaves = await Leave.find();
+        const leaves = await Leave.find().sort({createdAt:-1});
         return res.status(200).json({leaves});        
     } catch (err) {
         console.log(err);
@@ -80,6 +93,20 @@ router.put("/:id", async(req,res) => {
             return res.status(404).json({error:"Leave not found"});
 
         }
+
+        const mailOptions = {
+            from:'udulacode@outlook.com',
+            to:updatedLeave.email,
+            subject:'Leave Status Update',
+            html:`<p>Your Leave request has been updated to `+ updatedLeave.leaveTypeStatus + `</p>`
+        };
+        transporter.sendMail(mailOptions,(error,info) => {
+            if(error){
+                console.log("Error sending email:",error);
+            }else{
+                console.log("Email sent:",info.response);
+            }
+        });
         return res.status(200).json(updatedLeave);
         
     } catch (err) {

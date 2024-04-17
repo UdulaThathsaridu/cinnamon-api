@@ -11,6 +11,10 @@ const payslipSchema = new mongoose.Schema({
         type:String,
         required:[true,"Id is required"],
     },
+    email:{
+        type:String,
+        required:[true,"email is required"],
+    },
     name:{
 
         type:String,
@@ -67,6 +71,7 @@ const validatePayslip = data => {
 
     const schema = Joi.object({
         id:Joi.string().required(),
+        email:Joi.string().optional(),
         name:Joi.string().required(),
        date:Joi.date().required(),
         allowances:Joi.number().required(),

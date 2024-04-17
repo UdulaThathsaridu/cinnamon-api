@@ -144,6 +144,27 @@ router.get("/me",auth,async(req,res)=>{
 
 })
 
+router.put("/update-profile", auth, async (req, res) => {
+  try {
+      const userId = req.user._id; // Assuming you're using auth middleware to get the user
+      const { name, email, address, phone } = req.body;
+
+      // Update user profile in the database
+      const updatedUser = await User.findByIdAndUpdate(userId, { name, email, address, phone }, { new: true });
+
+      // Generate a new authentication token
+      const token = jwt.sign({ _id: updatedUser._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+      // Send the new token and updated user data in the response
+      return res.status(200).json({ token, user: updatedUser });
+  } catch (error) {
+      console.error("Error updating profile:", error);
+      return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
 //use router
 
 module.exports = router;

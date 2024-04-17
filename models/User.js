@@ -28,6 +28,8 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:[true,"address is required."]
     },
+    resetPasswordToken:String,
+    resetPasswordExpires:Date,
     createdAt: { type: Date }
 });
 
