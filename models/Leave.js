@@ -13,6 +13,10 @@ const leaveSchema = new mongoose.Schema({
         type:String,
         required:[true,"Name is required"],
     },
+    email:{
+        type:String,
+        required:[true,"Email is required"],
+    },
     leaveType:{
         type:String,
     required:[true,"Leave Type is required"],
@@ -40,6 +44,7 @@ const validateLeave = data => {
     const schema = Joi.object({
         id:Joi.string().required(),
         name:Joi.string().optional(),
+        email:Joi.string().optional(),
         leaveType:Joi.string().required(),
         leaveTypeDetails:Joi.string().required(),
         createdOn:Joi.date().required(),

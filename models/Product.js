@@ -6,10 +6,7 @@ const { USER_TYPES } = require('../constants');
 //define productSchema
 
 const productSchema = new mongoose.Schema({
-    id:{
-        type:String,
-        required:[true,"ID is required"],
-    },
+   
     name:{
         type:String,
         required:[true,"Name is required"],
@@ -30,6 +27,10 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:[true,"Description is required"],
     },
+    imageUrl:{
+        type:String,
+        required:false,
+    },
   
     createdAt: { type: Date }
    
@@ -44,8 +45,8 @@ const Product = new mongoose.model("Product",productSchema);
 const validateProduct = data => {
 
     const schema = Joi.object({
-        id:Joi.string().optional(),
-        name:Joi.string().required(),
+       
+        name:Joi.string().optional(),
         productId:Joi.string().required(),
         quantity:Joi.number().required(),
         price:Joi.string().required(),

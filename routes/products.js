@@ -4,28 +4,59 @@ const bcrypt = require('bcrypt');
 const auth = require('../middlewares/auth');
 const { USER_TYPES } = require("../constants");
 const { validateProduct, Product } = require('../models/Product');
+const multer = require('multer');
+
+//multer configuration
+
+const storage = multer.diskStorage({
+    destination:function (req,file,cb){
+        cb(null,'uploads/');
+    },
+    filename:function(req,file,cb){
+        cb(null,Date.now() + '-'+file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only images are allowed'), false);
+    }
+};
+const upload = multer({
+    storage:storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5 // 5MB limit
+    },
+    fileFilter: fileFilter
+
+});
 
 
 //create product
 
 
-router.post("/", async(req,res) => {
+router.post("/",upload.single('image'), async(req,res) => {
     const { error } = validateProduct(req.body);
-    const { name,productId,quantity,price,description} 
-          = req.body;
-
-          if(error){
-            return res.status(400).json({ error:error.details[0].message })
-          }
-          try {
-            const newProduct = new Product(req.body);
-            const result = await newProduct.save();
-            return res.status(201).json(result);
-            
-          } catch (err) {
-            console.log(err);
-            return res.status(500).json({error:err.message})
-          }
+    if(error){
+        return res.status(400).json({ error:error.details[0].message })
+      }
+      try {
+        const newProduct = new Product({
+            name: req.body.name,
+            productId: req.body.productId,
+            quantity: req.body.quantity,
+            price: req.body.price,
+            description: req.body.description,
+            imageUrl: req.file ? req.file.path : null
+        });
+        const result = await newProduct.save();
+        return res.status(201).json(result);
+      } catch (err) {
+        console.log(err);
+        return res.status(500).json({error:err.message})
+      }
 
 });
 
@@ -65,22 +96,41 @@ router.get("/:id", async(req,res) => {
 
 //update a product
 
-router.put("/:id", async(req,res) => {
+router.put("/:id",upload.single('image'), async(req,res) => {
 
     const {id} =req.params;
     if(!mongoose.isValidObjectId(id)){
         return res.status(400).json({error:"Please enter a valid id"});
     }
+    console.log(req.body);
     const {error} = validateProduct(req.body);
     if(error) {
         return res.status(400).json({error:error.details[0].message});
     }
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(id, req.body,{new:true});
+        let updatedProduct;
+        if(req.file){
+            updatedProduct = await Product.findByIdAndUpdate(
+                id,
+                {
+                    ...req.body,
+                    imageUrl:req.file.path //update the mageUrl with new image path
+                },
+                {new:true}
+            );
+        }else{
+           // If no new image is uploaded, update other fields except the imageUrl
+      updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        req.body,
+        {new:true}
+      );
+        }
         if(!updatedProduct){
             return res.status(404).json({error:"Product not found"});
 
         }
+      
         return res.status(200).json(updatedProduct);
         
     } catch (err) {
@@ -111,4 +161,3 @@ router.delete("/:id", async(req,res) => {
 })
 
 module.exports = router;
-
