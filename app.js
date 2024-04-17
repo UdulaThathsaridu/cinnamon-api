@@ -30,15 +30,21 @@ app.use("/api/leaves",require("./routes/leaves"));
 
 app.use("/api/suppliers",require("./routes/suppliers"));
 
+app.use("/api/orders",require("./routes/orders"));
+
+
 app.use("/api/payments",require("./routes/payments"));
 
 app.use("/api/products",require("./routes/products"));
+
+app.use("/api/mails",require("./routes/mails"));
 
 app.use("/api/deliveries",require("./routes/deliveries"));
 
 app.use("/api/inventories",require("./routes/inventories"));
 
 app.use("/api/vehicles",require("./routes/vehicles"));
+
 
 //server configurations
 //define port
