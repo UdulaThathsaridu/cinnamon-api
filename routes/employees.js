@@ -4,6 +4,15 @@ const bcrypt = require('bcrypt');
 const auth = require('../middlewares/auth');
 const { validateEmployee, User } = require("../models/User");
 const { USER_TYPES } = require("../constants");
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service:'outlook',
+    auth:{
+        user:'udulacode@outlook.com',
+        pass:'r#zor2003@#'
+    }
+});
 
 //create employee
 router.post("/", async (req, res) => {
@@ -22,6 +31,21 @@ router.post("/", async (req, res) => {
         const newUser = new User({ name, email, password: hashedPassword, userRole, phone, address, createdAt: Date.now() });
         //save the user
         const result = await newUser.save();
+
+        const mailOptions = {
+            from:'udulacode@outlook.com',
+            to:email,
+            subject:'Account Created Successfully',
+            text:`Dear ${name},\n\nYour account has been created Successfully.\n\nEmail:${email}\nPassword:abcd1234\n\nRegards,\nMandri Life`
+        };
+
+        transporter.sendMail(mailOptions, (error, info)=>{
+            if(error){
+                console.error('Error sending email:',error);
+            }else{
+                console.log('Email Sent:',info.response);
+            }
+        });
 
         delete result._doc.password;
 
