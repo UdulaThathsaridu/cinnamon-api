@@ -6,11 +6,13 @@ const connectDB = require("./config/db");
 const auth =require("./middlewares/auth")
 //intialize express app
 const app = express();
+var path = require('path');
 
 //middlewares
 app.use(express.json()); //send responses back in json format
 app.use(morgan("tiny"));//if we hit any api endpoint this will log into our console
 app.use(require("cors")());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 //routes
 
@@ -30,9 +32,14 @@ app.use("/api/leaves",require("./routes/leaves"));
 
 app.use("/api/suppliers",require("./routes/suppliers"));
 
+app.use("/api/orders",require("./routes/orders"));
+
+
 app.use("/api/payments",require("./routes/payments"));
 
 app.use("/api/products",require("./routes/products"));
+
+app.use("/api/mails",require("./routes/mails"));
 
 app.use("/api/deliveries",require("./routes/deliveries"));
 
@@ -44,11 +51,13 @@ app.use("/api/invoices",require("./routes/invoices"));
 
 app.use("/api/financials",require("./routes/financials"));
 
+app.use("/api/reset-password",require("./routes/resetpasswordrequest"));
 
+app.use("/api/carts",require("./routes/carts"));
 
+app.use("/api/checkouts",require("./routes/checkouts"));
 
-
-
+app.use("/api/customerorder",require("./routes/customerorder"));
 
 //server configurations
 //define port
