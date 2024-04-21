@@ -40,6 +40,16 @@ app.use("/api/inventories",require("./routes/inventories"));
 
 app.use("/api/vehicles",require("./routes/vehicles"));
 
+app.use("/api/invoices",require("./routes/invoices"));
+
+app.use("/api/financials",require("./routes/financials"));
+
+
+
+
+
+
+
 //server configurations
 //define port
 
