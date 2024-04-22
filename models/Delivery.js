@@ -29,9 +29,9 @@ const deliverySchema = new mongoose.Schema({
         type:String,
         required:[true,"Status is required"],
     },
-    description:{
+    email:{
         type:String,
-        required:[true,"description is required"],
+        required:[true,"email is required"],
     },
     createdAt: { type: Date }
 })
@@ -48,7 +48,7 @@ const validateDelivery = data => {
         weight:Joi.number().required(),
         courierName:Joi.string().required(),
         status:Joi.string().required(),
-        description:Joi.string().required(),
+        email:Joi.string().required(),
     
     })
     return schema.validate(data);

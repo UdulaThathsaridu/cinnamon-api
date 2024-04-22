@@ -18,13 +18,15 @@
     "express-validator": "^7.0.1",
     "joi": "^17.12.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.1.2",
+    "mongoose": "^8.2.4",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "pdfkit": "^0.15.0",
     "react-bootstrap": "^2.10.1",
+    "multer": "^1.4.5-lts.1",
     "react-chartjs-2": "^5.2.0",
     "vite": "^5.2.6",
-    "nodemailer": "^6.9.13",
+    
     
     "resend": "^3.2.0"
   },
