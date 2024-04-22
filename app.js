@@ -59,6 +59,8 @@ app.use("/api/checkouts",require("./routes/checkouts"));
 
 app.use("/api/customerorder",require("./routes/customerorder"));
 
+app.use("/api/feedbacks",require("./routes/feedbacks"));
+
 //server configurations
 //define port
 
