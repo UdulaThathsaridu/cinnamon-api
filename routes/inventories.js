@@ -1,128 +1,131 @@
 const router = require('express').Router();
 const { default: mongoose } = require('mongoose');
-const bcrypt = require('bcrypt');
-const auth = require('../middlewares/auth');
 const { validateInventory, Inventory } = require("../models/Inventory");
-const { USER_TYPES } = require("../constants");
 
 
-//create inventory
+// Create or update inventory item
 router.post("/", async (req, res) => {
     const { error } = validateInventory(req.body);
-    const {  productname, sku, quantity, unitprice, itemno, suppliername } = req.body;
+    const { productname, sku, quantity, unitprice, itemno, suppliername } = req.body;
+
     if (error) {
-        return res.status(400).json({ error: error.details[0].message })
+        return res.status(400).json({ error: error.details[0].message });
     }
+
     try {
-        const doesInventoryAlreadyExist = await Inventory.findOne({ sku });
+        let inventoryItem = await Inventory.findOne({ productname, sku });
 
-        if (doesInventoryAlreadyExist) {
-            return res.status(400).json({ error: `A Inventory with that sku [${sku}] already exists` })
+        if (inventoryItem) {
+            // If inventory item exists, update the quantity
+            inventoryItem.quantity += parseInt(quantity); // Convert quantity to integer and then add
+            await inventoryItem.save();
+            return res.status(200).json(inventoryItem);
+        } else {
+            // If inventory item doesn't exist, create a new one
+            const newInventory = new Inventory({ productname, sku, quantity, unitprice, itemno, suppliername, createdAt: Date.now() });
+            const result = await newInventory.save();
+            return res.status(201).json(result);
         }
-        
-        const newInventory = new Inventory({ productname, sku, quantity,unitprice,itemno,suppliername, createdAt: Date.now() });
-        //save the Inventory
-        const result = await newInventory.save();
-
-        delete result._doc.password;
-
-        return res.status(201).json({ ...result._doc });
-
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: err.message });
     }
 });
 
-//fetch inventory
+// Fetch all inventory items
 router.get("/", async (req, res) => {
     try {
-        // Fetch all inventory items from the database
         const inventories = await Inventory.find();
-        
-        // Send the inventory data as JSON response
         return res.status(200).json({ inventories });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error:err.message});
+        return res.status(500).json({ error: err.message });
     }
 });
 
-//update inventory
-router.put("/:id", async(req,res) => {
+// Update inventory item
+router.put("/:id", async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({ error: "Please enter a valid id" });
+    }
 
-    const {id} =req.params;
-    if(!mongoose.isValidObjectId(id)){
-        return res.status(400).json({error:"Please enter a valid id"});
+    const { error } = validateInventory(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
     }
-    const {error} = validateInventory(req.body);
-    if(error) {
-        return res.status(400).json({error:error.details[0].message});
-    }
+
     try {
-        const updatedInventory = await Inventory.findByIdAndUpdate(id, req.body,{new:true});
-        if(!updatedInventory){
-            return res.status(404).json({error:"Inventory not found"});
-
+        const updatedInventory = await Inventory.findByIdAndUpdate(id, req.body, { new: true });
+        if (!updatedInventory) {
+            return res.status(404).json({ error: "Inventory not found" });
         }
         return res.status(200).json(updatedInventory);
-        
     } catch (err) {
         console.log(err);
-        return res.status(500).json({error:err.message});
-        
+        return res.status(500).json({ error: err.message });
     }
 });
 
-
-
-
-//delete employee
-
-
-router.delete("/:id", async(req,res) => {
-    const {id} = req.params;
-    if(!mongoose.isValidObjectId(id)){
-        return res.status(400).json({error:"Please enter a valid id"});
+// Delete inventory item
+router.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({ error: "Please enter a valid id" });
     }
+
     try {
         const deleteInventory = await Inventory.findByIdAndDelete(id);
-        if(!deleteInventory){
-            return res.status(404).json({error:"Inventory not found"});
+        if (!deleteInventory) {
+            return res.status(404).json({ error: "Inventory not found" });
         }
-        return res.status(200).json({message:"Inventory deleted Successfully"});
-        
+        return res.status(200).json({ message: "Inventory deleted successfully" });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({error:err.message});
+        return res.status(500).json({ error: err.message });
     }
 });
 
-
-//get a single inventory
-
-router.get("/:id", async(req,res) => {
+// Fetch a single inventory item by id
+router.get("/:id", async (req, res) => {
     const { id } = req.params;
-    if (!id) { return res.status(400).json({ error: "no id specified." }); }
-    if(!mongoose.isValidObjectId(id)){
-        return res.status(400).json({error:"Please enter a vallid id"});
+    if (!id) {
+        return res.status(400).json({ error: "No id specified" });
+    }
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json({ error: "Please enter a valid id" });
     }
 
     try {
         const inventory = await Inventory.findById(id);
-
-        if(!inventory) {
-            return res.status(404).json({error:"Inventory not found"});
+        if (!inventory) {
+            return res.status(404).json({ error: "Inventory not found" });
         }
         return res.status(200).json(inventory);
     } catch (err) {
         console.log(err);
-        return res.status(400).json({ error:err.message });
+        return res.status(500).json({ error: err.message });
     }
-})
-
-
-
-
+});
+// Fetch all inventory items with product quantities
+router.get("/:id", async (req, res) => {
+    try {
+        const inventories = await Inventory.find();
+        const inventoryData = inventories.map(item => ({
+            
+            productname: item.productname,
+            sku: item.sku,
+            quantity: item.quantity, // Include quantity
+            unitprice: item.unitprice,
+            itemno: item.itemno,
+            suppliername: item.suppliername,
+            
+        }));
+        return res.status(200).json({ inventories: inventoryData });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;

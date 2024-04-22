@@ -6,10 +6,9 @@ const { USER_TYPES } = require('../constants');
 //define payslipSchema
 
 const paymentSchema = new mongoose.Schema({
-    id:{
-
-        type:String,
-        required:[true,"ID is required"],
+    cart:{
+        type:Array,
+        required:[true,"cart is required"],
     },
     name:{
 
@@ -43,12 +42,14 @@ const Payment = new mongoose.model("Payment",paymentSchema);
 const validatePayment = data => {
 
     const schema = Joi.object({
-        id:Joi.string().optional(),
+        userId: Joi.string().optional(),
+        cart:Joi.array().optional(),
         name:Joi.string().required(),
         number:Joi.number().required(),
         expiryDate:Joi.date().required(),
         cvv:Joi.number().required(),
         issuingBank:Joi.string().required(),
+        totalPrice:Joi.number().optional(),
     })
     return schema.validate(data);
 
