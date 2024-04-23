@@ -3,7 +3,7 @@ const Joi = require('joi');
 const { USER_TYPES } = require('../constants');
 
 
-//define vehicleSchema
+//define vehicleSchemanpm
 
 const vehicleSchema = new mongoose.Schema({
     vehicle:{
