@@ -61,6 +61,10 @@ app.use("/api/customerorder",require("./routes/customerorder"));
 
 app.use("/api/feedbacks",require("./routes/feedbacks"));
 
+app.use("/api/shipments",require("./routes/shipments"));
+
+app.use("/api/tmails",require("./routes/tmails"));
+
 //server configurations
 //define port
 
