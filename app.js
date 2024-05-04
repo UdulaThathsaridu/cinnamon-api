@@ -65,6 +65,8 @@ app.use("/api/shipments",require("./routes/shipments"));
 
 app.use("/api/tmails",require("./routes/tmails"));
 
+app.use("/api/transportmailsupp",require("./routes/transportmailsupp"));
+
 //server configurations
 //define port
 
