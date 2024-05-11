@@ -11,6 +11,10 @@ const vehicleSchema = new mongoose.Schema({
         emum:['van','car','truck','lorry'],
         optional:[true,"Vehicle is required"],
     },
+    vnumber:{
+        type:String,
+        required:[true,"vnumber is required"],
+    },    
     model:{
         type:String,
         required:[true,"Model is required"],
@@ -40,6 +44,7 @@ const validateVehicle = data => {
 
     const schema = Joi.object({
         vehicle:Joi.string().valid('van','car','truck','lorry').required(),
+        vnumber:Joi.string().required(),
         model:Joi.string().required(),
         status: Joi.string().valid('good', 'bad').required(), // Validate status with enum values
        last_inspection:Joi.date().required(),
