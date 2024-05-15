@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const auth = require('../middlewares/auth');
 const { USER_TYPES } = require("../constants");
 const { validateDelivery, Delivery } = require('../models/Delivery');
+const nodemailer = require('nodemailer');
 
 
 //create delivery
@@ -69,6 +70,8 @@ router.get("/:id", async(req,res) => {
 router.put("/:id", async(req,res) => {
 
     const {id} =req.params;
+    const { status, email } = req.body; 
+
     if(!mongoose.isValidObjectId(id)){
         return res.status(400).json({error:"Please enter a valid id"});
     }
@@ -77,11 +80,31 @@ router.put("/:id", async(req,res) => {
         return res.status(400).json({error:error.details[0].message});
     }
     try {
+
         const updatedDelivery = await Delivery.findByIdAndUpdate(id, req.body,{new:true});
         if(!updatedDelivery){
             return res.status(404).json({error:"Delivery not found"});
 
         }
+        const transporter = nodemailer.createTransport({
+            service: 'hotmail', // Use your email service provider, e.g., Gmail
+            auth: {
+              user: 'amadhiyapaa@hotmail.com', // Your email address
+              pass: 'AmaTheToad2003' // Your email password or app-specific password
+            }
+          });
+
+        if (status === "Delivered") {
+            // Send email notification using the configured transporter
+            await transporter.sendMail({
+              from: 'amadhiyapaa@hotmail.com',
+              to: email, // Email address retrieved from the request body
+              subject: 'Delivery Status Update',
+              text: `Your delivery (ID: ${id}) has been delivered.`,
+            });
+          }
+      
+
         return res.status(200).json(updatedDelivery);
         
     } catch (err) {
