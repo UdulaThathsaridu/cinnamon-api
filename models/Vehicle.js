@@ -8,15 +8,22 @@ const { USER_TYPES } = require('../constants');
 const vehicleSchema = new mongoose.Schema({
     vehicle:{
         type:String,
+        emum:['van','car','truck','lorry'],
         optional:[true,"Vehicle is required"],
     },
+    vnumber:{
+        type:String,
+        required:[true,"vnumber is required"],
+    },    
     model:{
         type:String,
         required:[true,"Model is required"],
     },
-    status:{
-        type:String,
-        required:[true,"status is required"],
+    status: {
+        type: String,
+        enum: ['good', 'bad'], // Define enum for status
+        required: [true, "Status is required"],
+        
     },
     last_inspection:{
         type:Date,
@@ -36,9 +43,10 @@ const Vehicle = new mongoose.model("Vehicle",vehicleSchema);
 const validateVehicle = data => {
 
     const schema = Joi.object({
-        vehicle:Joi.string().required(),
+        vehicle:Joi.string().valid('van','car','truck','lorry').required(),
+        vnumber:Joi.string().required(),
         model:Joi.string().required(),
-       status:Joi.string().required(),
+        status: Joi.string().valid('good', 'bad').required(), // Validate status with enum values
        last_inspection:Joi.date().required(),
        next_inspection:Joi.date().required(),
     })
