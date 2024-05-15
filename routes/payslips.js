@@ -93,6 +93,32 @@ router.get("/:id", async(req,res) => {
     }
 })
 
+// Endpoint to check if a payslip exists for a given date and employee email
+router.get("/check/:date/:email", async (req, res) => {
+    const { date, email } = req.params;
+
+    try {
+        // Construct a date range for the entire month of the provided date
+        const startOfMonth = new Date(date);
+        startOfMonth.setDate(1); // Set to the first day of the month
+        const endOfMonth = new Date(date);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1); // Set to the first day of the next month
+
+        // Query the database to check if a payslip exists for the provided email and month
+        const payslip = await PaySlip.findOne({ email: email, date: { $gte: startOfMonth, $lt: endOfMonth } });
+
+        // If a payslip exists for the month and email, return true
+        // Otherwise, return false
+        const exists = payslip ? true : false;
+
+        return res.status(200).json({ exists });
+    } catch (error) {
+        console.error("Error checking payslip:", error);
+        return res.status(500).json({ error: "An error occurred while checking payslip" });
+    }
+});
+
+
 //update a payslip
 
 router.put("/:id", async(req,res) => {

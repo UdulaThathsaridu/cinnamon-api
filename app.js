@@ -67,6 +67,10 @@ app.use("/api/tmails",require("./routes/tmails"));
 
 app.use("/api/transportmailsupp",require("./routes/transportmailsupp"));
 
+app.use("/api/paymentmailsupp",require("./routes/paymentmailsupp"));
+
+app.use("/api/suppliermail",require("./routes/suppliermail"));
+
 //server configurations
 //define port
 
